@@ -1,86 +1,126 @@
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import React, { useEffect, useState } from 'react'
+import Aron from '../components/Aron'
+import FlipCard from '../components/FlipCard'
+import Header from '../components/Header'
+import Vaupel from '../components/Vaupel'
 
-const Home: NextPage = () => {
+type MainPageProps = {}
+
+const MainPage = () => {
+  const [state, setState] = useState<number>(0)
+
+  const moveUp = `translateY(-${state <= 10 ? state * 5 : 50}vh)`
+  const moveDown = `translateY(${state <= 10 ? state * 5 : 50}vh)`
+  const slide = `translateX(calc(${state <= 5 ? state * 10 : 50}vw - 12.5vw))`
+  const roll = `rotateZ(${state <= 5 ? state * 72 : 360}deg)`
+  const grow = `${state <= 5 ? state * 10 : 50}vh`
+  const growText = `${state <= 5 ? state * 0.2 : 1}rem`
+  const headerAppear = `translateY(${state <= 14 ? 0 : 11}vh)`
+  const opacityIncrease = `${state <= 10 ? state / 10 : 1}`
+  const opacityDecrease = `${state <= 10 ? 1 - state / 10 : 0}`
+  const flip180 = 'rotateY(180deg)'
+  const flip360 = 'rotateY(360deg)'
+
+  const [flipState, setFlipState] = useState<string>(roll)
+
+  useEffect(() => {
+    window.addEventListener('wheel', scroll)
+    window.addEventListener('wheel', flipPic)
+    //window.addEventListener("wheel", flipOnHover);
+    console.log(state)
+    return () => {
+      window.removeEventListener('wheel', scroll)
+      window.removeEventListener('wheel', flipPic)
+    }
+  }, [state])
+
+  function scroll(event: WheelEvent): void {
+    if (state > 0 && event.deltaY < 0) {
+      setState(state - 1)
+    } else if (state < 20 && event.deltaY > 0) {
+      setState(state + 1)
+    }
+  }
+
+  function flipPic(event: WheelEvent): void {
+    if (state >= 14) {
+      setFlipState(flip180)
+    }
+    if (flipState === flip180 && state < 14) {
+      setFlipState(flip360)
+    }
+    if (flipState === flip360 && state >= 10) {
+      setFlipState(roll)
+    }
+  }
+
+  const aronStyle = {
+    transform: moveUp,
+    opacity: opacityDecrease,
+  }
+
+  const vaupelStyle = {
+    transform: moveDown,
+    opacity: opacityDecrease,
+  }
+
+  const flipcardStyle = {
+    transform: slide,
+    width: grow,
+    height: grow,
+  }
+
+  const flipcardInnerStyle = {
+    transform: `${flipState}`,
+    width: grow,
+    height: grow,
+  }
+
+  const flipcardFrontStyle = {
+    width: grow,
+    height: grow,
+  }
+
+  const flipcardBackStyle = {
+    width: grow,
+    height: grow,
+  }
+
+  const flipcardPictureStyle = {
+    width: grow,
+    height: grow,
+  }
+
+  const flipcardTextStyle = {
+    fontSize: growText,
+  }
+
+  const headerStyle = {
+    transform: headerAppear,
+    opacity: opacityIncrease,
+  }
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center py-2">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-20 text-center">
-        <h1 className="text-6xl font-bold">
-          Welcome to{' '}
-          <a className="text-blue-600" href="https://nextjs.org">
-            Next.js!
-          </a>
-        </h1>
-
-        <p className="mt-3 text-2xl">
-          Get started by editing{' '}
-          <code className="rounded-md bg-gray-100 p-3 font-mono text-lg">
-            pages/index.tsx
-          </code>
-        </p>
-
-        <div className="mt-6 flex max-w-4xl flex-wrap items-center justify-around sm:w-full">
-          <a
-            href="https://nextjs.org/docs"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Documentation &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Find in-depth information about Next.js features and API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Learn &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Learn about Next.js in an interactive course with quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Examples &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Discover and deploy boilerplate example Next.js projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className="mt-6 w-96 rounded-xl border p-6 text-left hover:text-blue-600 focus:text-blue-600"
-          >
-            <h3 className="text-2xl font-bold">Deploy &rarr;</h3>
-            <p className="mt-4 text-xl">
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className="flex h-24 w-full items-center justify-center border-t">
-        <a
-          className="flex items-center justify-center gap-2"
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-        </a>
-      </footer>
+    <div className="wrapper-main bg-4x relative h-[100vh] w-[100vw] overflow-hidden">
+      <Aron style={aronStyle} />
+      <Vaupel style={vaupelStyle} />
+      <Header style={headerStyle} />
+      <FlipCard
+        mouseenter={() =>
+          state >= 14 && state <= 20 ? setFlipState(flip360) : null
+        }
+        mouseleave={() =>
+          state >= 14 && flipState === flip360 ? setFlipState(flip180) : null
+        }
+        outer={flipcardStyle}
+        inner={flipcardInnerStyle}
+        front={flipcardFrontStyle}
+        back={flipcardBackStyle}
+        text={flipcardTextStyle}
+        picture={flipcardPictureStyle}
+      />
     </div>
   )
 }
 
-export default Home
+export default MainPage
